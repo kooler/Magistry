@@ -11,6 +11,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
+import data.City;
+
 import forms.addCityFrame;
 
 public class test {
@@ -31,8 +33,11 @@ public class test {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
+				
 				new addCityFrame(processor, null);
 			}
+			
+			
 		});
 		menu.add(addCity);
 		mainFrame.setJMenuBar(menuBar);
@@ -43,7 +48,22 @@ public class test {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
-				new addCityFrame(processor, new Point(e.getPoint()));
+				City c = processor.getCity(e.getPoint());
+				if (c == null) {
+					new addCityFrame(processor, e.getPoint());
+				} else {
+					if (c.isSelected()) {
+						processor.deselectAllCities();
+					} else {
+						City selected = processor.getSelectedCity();
+						if (selected != null) {
+							processor.connectCities(c, selected);
+							processor.deselectAllCities();
+						} else {
+							processor.selectCity(c);
+						}
+					}
+				}
 			}
 		});
 		
@@ -53,6 +73,7 @@ public class test {
 		processor.setCanvas(canvas);
 		
 		mainFrame.show();
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 }
