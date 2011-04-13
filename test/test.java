@@ -1,10 +1,12 @@
 package test;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -41,6 +43,7 @@ public class test {
 		});
 		menu.add(addCity);
 		mainFrame.setJMenuBar(menuBar);
+		mainFrame.setLayout(new BorderLayout());
 		
 		JPanel canvas = new JPanel();
 		canvas.setBackground(Color.WHITE);
@@ -52,22 +55,35 @@ public class test {
 				if (c == null) {
 					new addCityFrame(processor, e.getPoint());
 				} else {
-					if (c.isSelected()) {
-						processor.deselectAllCities();
-					} else {
-						City selected = processor.getSelectedCity();
-						if (selected != null) {
-							processor.connectCities(c, selected);
+					if (!processor.selectionStarted()) {
+						if (c.isSelected()) {
 							processor.deselectAllCities();
 						} else {
-							processor.selectCity(c);
+							City selected = processor.getSelectedCity();
+							if (selected != null) {
+								processor.connectCities(c, selected);
+								processor.deselectAllCities();
+							} else {
+								processor.selectCity(c);
+							}
 						}
+					} else {
+						processor.addToSelection(c);
 					}
 				}
 			}
 		});
 		
-		mainFrame.add(canvas);
+		mainFrame.add(canvas, BorderLayout.CENTER);
+		JButton start = new JButton("Start");
+		start.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				super.mousePressed(e);
+				processor.startSelection();
+			}
+		});
+		mainFrame.add(start, BorderLayout.SOUTH);
 		
 		processor = new Processor();
 		processor.setCanvas(canvas);

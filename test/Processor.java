@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import javax.print.attribute.standard.Finishings;
 import javax.swing.JPanel;
 
 import data.*;
@@ -14,6 +15,11 @@ public class Processor {
 	JPanel canvas;
 	final int CITY_RECT_WIDTH = 50;
 	final int CITY_RECT_HEIGHT = 50;
+	City startCity = null;
+	City finCity = null;
+	private boolean selectionStarted = false;
+	ArrayList<Route> routes;
+	ArrayList<City> checkedCities;
 	
 	public Processor() {
 		cities = new ArrayList<City>();
@@ -45,8 +51,12 @@ public class Processor {
 	}
 	
 	public void selectCity(City c) {
+		selectCity(c, Color.RED);
+	}
+	
+	public void selectCity(City c, Color col) {
 		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
-		g2d.setColor(Color.RED);
+		g2d.setColor(col);
 		g2d.drawOval(c.getPoint().x, c.getPoint().y, CITY_RECT_WIDTH, CITY_RECT_HEIGHT);		
 		c.select();
 	}
@@ -90,5 +100,67 @@ public class Processor {
 			x2 = city2.getPoint().x + CITY_RECT_WIDTH;
 		}
 		g2d.drawLine(x1, city1.getPoint().y + CITY_RECT_HEIGHT/2, x2, city2.getPoint().y + CITY_RECT_HEIGHT/2);
+	}
+	
+	public void startSelection() {
+		selectionStarted = true;
+		startCity = null;
+		finCity = null;
+		deselectAllCities();
+	}
+	
+	public boolean selectionStarted() {
+		return selectionStarted;
+	}
+	
+	public void addToSelection(City c) {
+		if (startCity == null) {
+			startCity = c;
+		} else {
+			finCity = c;
+			selectionStarted = false;
+			selectCity(finCity, Color.BLUE);
+			startProcess();
+		}
+		selectCity(startCity, Color.BLUE);
+	}
+	
+	private void startProcess() {
+		generatePopulation();
+	}
+	
+	public void generatePopulation() {
+		routes = new ArrayList<Route>();
+		Route r = new Route();
+		
+		checkedCities = new ArrayList<City>();
+		r.addCity(startCity);
+		checkedCities.add(startCity);
+		checkNeightbours(startCity, finCity, r);
+		
+		printRoutes();
+	}
+	
+	public void printRoutes() {
+		for(Route r : routes) {
+			System.out.println(r);
+		}
+	}
+	
+	private void checkNeightbours(City c, City lookFor, Route route) {
+		for(City city : c.getConnections()) {
+			if (route.containsCity(city)) {
+				continue;
+			}
+			if (city.equals(lookFor)) {
+				route.addCity(city);
+				routes.add(route);
+				break;
+			} else {
+				Route newRoute = new Route(route);
+				newRoute.addCity(city);
+				checkNeightbours(city, lookFor, newRoute);
+			}
+		}
 	}
 }

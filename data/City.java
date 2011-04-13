@@ -36,4 +36,12 @@ public class City {
 			connections.add(city);
 		}
 	}
+	
+	public ArrayList<City> getConnections() {
+		return connections;
+	}
+	
+	public String toString() {
+		return name + "(" + point.x + ";" + point.y + ")";
+	}
 }
