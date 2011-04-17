@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.print.attribute.standard.Finishings;
 import javax.swing.JPanel;
@@ -32,6 +33,9 @@ public class Processor {
 		g2d.setColor(Color.BLACK);
 		g2d.drawOval(p.x, p.y, CITY_RECT_WIDTH, CITY_RECT_HEIGHT);
 		g2d.drawString(name, p.x + 10, p.y + 30);
+		for (City ct : cities) {
+			selectCity(ct, Color.BLUE);
+		}
 	}
 	
 	public void setCanvas(JPanel p) {
@@ -51,6 +55,9 @@ public class Processor {
 	}
 	
 	public void selectCity(City c) {
+		for (City ct : cities) {
+			selectCity(c, Color.BLUE);
+		}
 		selectCity(c, Color.RED);
 	}
 	
@@ -125,8 +132,46 @@ public class Processor {
 		selectCity(startCity, Color.BLUE);
 	}
 	
+	private void madePairingOfTwoBestParents() {
+		//Get two bets parents
+		int bestLevel = 0;
+		Route parent1 = null;
+		for (Route r : routes) {
+			if (r.getLength() > bestLevel) {
+				parent1 = r;
+			}
+		}
+		Route parent2 = null;
+		bestLevel = 0;
+		for (Route r : routes) {
+			if (r.getLength() > bestLevel && !r.equals(parent1)) {
+				parent2 = r;
+			}
+		}
+		
+		if (parent1 != null && parent2 != null) {
+			System.err.println("Two parents Found!");
+			System.err.println("Parent1: " + parent1);
+			System.err.println("Parent2: " + parent2);
+			//Generate children
+			Route ch1 = Routes.crossover(parent1, parent2);
+			Route ch2 = Routes.crossover(parent1, parent2);
+			System.err.println("Child1: " + ch1);
+			System.err.println("Child2: " + ch2);
+			//Replace parent with children
+			parent1 = ch1;
+			parent2 = ch2;
+		} else {
+			System.err.println("Can't find two parents");
+		}
+	}
+	
 	private void startProcess() {
 		generatePopulation();
+		//madePairingOfTwoBestParents();
+		
+		//printDivider();
+		//printRoutes();
 	}
 	
 	public void generatePopulation() {
@@ -139,6 +184,10 @@ public class Processor {
 		checkNeightbours(startCity, finCity, r);
 		
 		printRoutes();
+	}
+	
+	public void printDivider() {
+		System.out.println("---------------------------------------------------");
 	}
 	
 	public void printRoutes() {
