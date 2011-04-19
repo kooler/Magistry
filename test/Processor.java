@@ -45,8 +45,8 @@ public class Processor {
 	public City getCity(Point p) {
 		City result = null;
 		for(City c : cities) {
-			if (c.getPoint().x < p.x && c.getPoint().y < p.y && 
-					(c.getPoint().x + CITY_RECT_WIDTH) > p.x && (c.getPoint().y + CITY_RECT_HEIGHT) > p.y) {
+			if (c.getPoint().x <= p.x && c.getPoint().y <= p.y && 
+					(c.getPoint().x + CITY_RECT_WIDTH) >= p.x && (c.getPoint().y + CITY_RECT_HEIGHT) >= p.y) {
 				result = c;
 				break;
 			}
@@ -150,17 +150,17 @@ public class Processor {
 		}
 		
 		if (parent1 != null && parent2 != null) {
-			System.err.println("Two parents Found!");
-			System.err.println("Parent1: " + parent1);
-			System.err.println("Parent2: " + parent2);
+			System.out.println("Two parents Found!");
+			System.out.println("Parent1: " + parent1);
+			System.out.println("Parent2: " + parent2);
 			//Generate children
 			Route ch1 = Routes.crossover(parent1, parent2);
 			Route ch2 = Routes.crossover(parent1, parent2);
-			System.err.println("Child1: " + ch1);
-			System.err.println("Child2: " + ch2);
+			System.out.println("Child1: " + ch1);
+			System.out.println("Child2: " + ch2);
 			//Replace parent with children
 			parent1 = ch1;
-			parent2 = ch2;
+			//parent2 = ch2;
 		} else {
 			System.err.println("Can't find two parents");
 		}
@@ -168,9 +168,9 @@ public class Processor {
 	
 	private void startProcess() {
 		generatePopulation();
-		//madePairingOfTwoBestParents();
+		madePairingOfTwoBestParents();
 		
-		//printDivider();
+		printDivider();
 		//printRoutes();
 	}
 	
@@ -183,7 +183,7 @@ public class Processor {
 		checkedCities.add(startCity);
 		checkNeightbours(startCity, finCity, r);
 		
-		printRoutes();
+		//printRoutes();
 	}
 	
 	public void printDivider() {

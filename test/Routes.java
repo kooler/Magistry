@@ -12,9 +12,9 @@ public class Routes {
 	 */
 	private static ArrayList<Segment> getRouteSegments(Route r) {
 		ArrayList<Segment> segments = new ArrayList<Segment>();
-		for (int i = 0; i < r.getCities().size(); i++) {
+		for (int i = 0; i < (r.getCities().size() - 1); i++) {
 			for (int j = 1; j < r.getCities().size(); j++) {
-				if (j > (i + 1)) {
+				if (j > i) {
 					ArrayList<City> cities = new ArrayList<City>();
 					for (int k = i; k <= j; k++) {
 						cities.add(r.getCities().get(k));
@@ -34,8 +34,11 @@ public class Routes {
 		ArrayList<Segment> firstCitySegments = getRouteSegments(route1);
 		ArrayList<Segment> finCitySegments = getRouteSegments(route2);
 
+		//System.err.println("City1 segments: " + firstCitySegments);
+		//System.err.println("City2 segments: " + finCitySegments);
+		
 		for(Segment s : firstCitySegments) {
-			if (finCitySegments.contains(s)) {
+			if (hasSegment(finCitySegments, s.getStartCity(), s.getFinCity())) {
 				commonSegments.add(s);
 			}
 		}
@@ -51,7 +54,7 @@ public class Routes {
 		for (Segment seg: segments) {
 			if (seg.getStartCity().equals(s.getStartCity()) &&
 					seg.getFinCity().equals(s.getFinCity()) &&
-					!seg.getRoute().equals(s.getRoute())) {
+					seg.getCities().size() != s.getCities().size()) {
 				sameSeg = seg;
 				break;
 			}
@@ -66,19 +69,43 @@ public class Routes {
 		Route child = null;
 		ArrayList<Segment> commonSegments = getCommonSegments(route1, route2);
 		for (Segment s : commonSegments) {
-			System.err.println(s);
+			System.out.println("Found common segment:" + s);
 		}
 		//Replace segment in route1 with another one from commonSegments
-		if (commonSegments.size() > 1) {
+		if (commonSegments.size() > 0) {
 			Random r = new Random();
 			int segmentNumber = Math.round((commonSegments.size() - 1) * r.nextFloat()); 
 			Segment replaceIt = commonSegments.get(segmentNumber);
-			Segment replacement = getSegmentFromAnotherRoute(replaceIt, commonSegments);
+			//System.out.println("Random segment: " + replaceIt);
+			Route searchInRoute;
+			if (replaceIt.getRoute().equals(route1)) {
+				searchInRoute = route2;
+			} else {
+				searchInRoute = route1;
+			}
+			Segment replacement = getSegmentFromAnotherRoute(replaceIt, getRouteSegments(searchInRoute));
+			System.out.println("Replacing in " + replaceIt.getRoute() + " [" + replaceIt + "] to [" + replacement + "]");
+			//System.out.println("Replacement segment: " + replacement);
 			//Replace segment
-			child = new Route(commonSegments.get(segmentNumber).getRoute());
+			child = new Route(replaceIt.getRoute());
 			child.replaceSegment(replaceIt, replacement);
+		} else {
+			System.err.println("No similar segments found");
 		}
 		return child;
+	}
+	
+	public static boolean hasSegment(ArrayList<Segment> segments, City startCity, City finCity) {
+		boolean has = false;
+		
+		for (Segment s : segments) {
+			if (s.getStartCity().equals(startCity) && s.getFinCity().equals(finCity)) {
+				has = true;
+				break;
+			}
+		}
+		
+		return has;
 	}
 	
 }

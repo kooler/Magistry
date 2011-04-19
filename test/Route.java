@@ -39,6 +39,10 @@ public class Route {
 	}
 	
 	public void replaceSegment(Segment replaceIt, Segment replaceTo) {
+		if (replaceIt == null || replaceTo == null) {
+			System.out.println("Error in replacement, not enough data");
+			return;
+		}
 		ArrayList<City> newCities = new ArrayList<City>();
 		boolean replacementStarted = false;
 		for(City c : getCities()) {
@@ -67,5 +71,4 @@ public class Route {
 		Random r = new Random();
 		return r.nextInt(); 
 	}
-	
 }
