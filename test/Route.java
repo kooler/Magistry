@@ -68,7 +68,11 @@ public class Route {
 	}
 	
 	public int getLength() {
-		Random r = new Random();
-		return r.nextInt(); 
+		int length = 0;
+		for (int i = 0; i < (cities.size() - 1); i++) {
+			length += Math.round(Math.sqrt(Math.pow(cities.get(i).getPoint().x - cities.get(i + 1).getPoint().x,2) + 
+					Math.pow(cities.get(i).getPoint().y - cities.get(i + 1).getPoint().y,2)));
+		}
+		return length;
 	}
 }

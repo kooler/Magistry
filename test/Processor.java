@@ -3,6 +3,7 @@ package test;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -11,7 +12,7 @@ import javax.swing.JPanel;
 
 import data.*;
 
-public class Processor {
+public class Processor implements Serializable {
 	ArrayList<City> cities;
 	JPanel canvas;
 	final int CITY_RECT_WIDTH = 50;
@@ -27,15 +28,18 @@ public class Processor {
 		canvas = new JPanel();
 	}
 	
+	public ArrayList<City> getCities() {
+		return cities;
+	}
+	
+	public void setCities(ArrayList<City> c) {
+		cities = c;
+	}
+	
 	public void addCity(String name, Point p) {
-		cities.add(new City(name, p));
-		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
-		g2d.setColor(Color.BLACK);
-		g2d.drawOval(p.x, p.y, CITY_RECT_WIDTH, CITY_RECT_HEIGHT);
-		g2d.drawString(name, p.x + 10, p.y + 30);
-		for (City ct : cities) {
-			selectCity(ct, Color.BLUE);
-		}
+		City c = new City(name, p);
+		cities.add(c);
+		selectCity(c);
 	}
 	
 	public void setCanvas(JPanel p) {
@@ -64,7 +68,8 @@ public class Processor {
 	public void selectCity(City c, Color col) {
 		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
 		g2d.setColor(col);
-		g2d.drawOval(c.getPoint().x, c.getPoint().y, CITY_RECT_WIDTH, CITY_RECT_HEIGHT);		
+		g2d.drawOval(c.getPoint().x, c.getPoint().y, CITY_RECT_WIDTH, CITY_RECT_HEIGHT);
+		g2d.drawString(c.getName(), c.getPoint().x + 10, c.getPoint().y + 30);
 		c.select();
 	}
 	
@@ -72,6 +77,7 @@ public class Processor {
 		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
 		g2d.setColor(Color.BLACK);
 		g2d.drawOval(c.getPoint().x, c.getPoint().y, CITY_RECT_WIDTH, CITY_RECT_HEIGHT);
+		g2d.drawString(c.getName(), c.getPoint().x + 10, c.getPoint().y + 30);
 		c.deselect();
 	}
 	
@@ -92,9 +98,7 @@ public class Processor {
 		return result;
 	}
 	
-	public void connectCities(City city1, City city2) {
-		city1.connectTo(city2);
-		city2.connectTo(city1);
+	private void drawConnection(City city1, City city2) {
 		//Draw line
 		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
 		g2d.setColor(Color.BLACK);
@@ -107,6 +111,12 @@ public class Processor {
 			x2 = city2.getPoint().x + CITY_RECT_WIDTH;
 		}
 		g2d.drawLine(x1, city1.getPoint().y + CITY_RECT_HEIGHT/2, x2, city2.getPoint().y + CITY_RECT_HEIGHT/2);
+	}
+	
+	public void connectCities(City city1, City city2) {
+		city1.connectTo(city2);
+		city2.connectTo(city1);
+		drawConnection(city1, city2);
 	}
 	
 	public void startSelection() {
@@ -209,6 +219,16 @@ public class Processor {
 				Route newRoute = new Route(route);
 				newRoute.addCity(city);
 				checkNeightbours(city, lookFor, newRoute);
+			}
+		}
+	}
+	
+	public void redraw() {
+		deselectAllCities();
+		//Redraw connections
+		for (City c : cities) {
+			for (City c1 : c.getConnections()) {
+				drawConnection(c, c1);
 			}
 		}
 	}
