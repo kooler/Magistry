@@ -207,6 +207,27 @@ public class Processor implements Serializable {
 	}
 	
 	private void checkNeightbours(City c, City lookFor, Route route) {
+		//Get random neighbour
+		boolean processed = false;
+		int MAX_ITERATIONS = 100;
+		int iteration = 0;
+		Random r = new Random();
+		do {
+			int neighNum = Math.round(r.nextFloat() * (c.getConnections().size() - 1));
+			City neigh = c.getConnections().get(neighNum);
+			//if (!route.containsCity(neigh)) {
+				processed = true;
+				if (neigh.equals(lookFor)) {
+					route.addCity(neigh);
+				} else {
+					Route newRoute = new Route(route);
+					newRoute.addCity(neigh);
+					checkNeightbours(neigh, lookFor, newRoute);
+				}
+			//}
+			iteration++;
+		} while (!processed && iteration < MAX_ITERATIONS);
+		/*
 		for(City city : c.getConnections()) {
 			if (route.containsCity(city)) {
 				continue;
@@ -220,7 +241,7 @@ public class Processor implements Serializable {
 				newRoute.addCity(city);
 				checkNeightbours(city, lookFor, newRoute);
 			}
-		}
+		}*/
 	}
 	
 	public void redraw() {
