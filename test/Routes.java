@@ -69,7 +69,7 @@ public class Routes {
 		Route child = null;
 		ArrayList<Segment> commonSegments = getCommonSegments(route1, route2);
 		for (Segment s : commonSegments) {
-			System.out.println("Found common segment:" + s);
+			//System.out.println("Found common segment:" + s);
 		}
 		//Replace segment in route1 with another one from commonSegments
 		if (commonSegments.size() > 0) {
@@ -84,13 +84,13 @@ public class Routes {
 				searchInRoute = route1;
 			}
 			Segment replacement = getSegmentFromAnotherRoute(replaceIt, getRouteSegments(searchInRoute));
-			System.out.println("Replacing in " + replaceIt.getRoute() + " [" + replaceIt + "] to [" + replacement + "]");
+			//System.out.println("Replacing in " + replaceIt.getRoute() + " [" + replaceIt + "] to [" + replacement + "]");
 			//System.out.println("Replacement segment: " + replacement);
 			//Replace segment
 			child = new Route(replaceIt.getRoute());
 			child.replaceSegment(replaceIt, replacement);
 		} else {
-			System.err.println("No similar segments found");
+			//System.err.println("No similar segments found");
 		}
 		return child;
 	}
@@ -107,5 +107,5 @@ public class Routes {
 		
 		return has;
 	}
-	
+		
 }

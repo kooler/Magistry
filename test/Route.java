@@ -35,12 +35,13 @@ public class Route {
 		for(City c : getCities()) {
 			output += c + " -> ";
 		}
+		output += " :: " + getLength();
 		return output;
 	}
 	
 	public void replaceSegment(Segment replaceIt, Segment replaceTo) {
 		if (replaceIt == null || replaceTo == null) {
-			System.out.println("Error in replacement, not enough data");
+			//System.out.println("Error in replacement, not enough data");
 			return;
 		}
 		ArrayList<City> newCities = new ArrayList<City>();

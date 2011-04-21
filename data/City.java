@@ -43,7 +43,7 @@ public class City implements Serializable {
 	}
 	
 	public String toString() {
-		return name + "(" + point.x + ";" + point.y + ")";
+		return name;//+ "(" + point.x + ";" + point.y + ")";
 	}
 	
 	public String getName() {
