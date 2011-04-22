@@ -35,8 +35,6 @@ public class Connection {
 		deltaY = dy/steps;
 		deltaX = dx/steps;
 		
-		System.out.println("Drawing line from " + city1 + " to " + city2 + ": deltaY=" + deltaY + ", deltaX=" + deltaX + ", steps=" + steps);
-		
 		float x = city1.getPoint().x + Processor.CITY_RECT_WIDTH/2, y = city1.getPoint().y + Processor.CITY_RECT_HEIGHT/2;
 		int px, py = 0;
 		for (int i = 0; i < steps; i++) {			

@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import sun.reflect.generics.tree.BottomSignature;
 
 import data.City;
+import data.Connection;
 
 import forms.addCityFrame;
 
@@ -65,9 +66,11 @@ public class test {
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
 				City c = processor.getCity(e.getPoint());
-				
-				if (c == null) {
+				Connection con = processor.getConnection(e.getPoint());
+				if (c == null && con == null) {
 					new addCityFrame(processor, e.getPoint());
+				} else if (con != null) {
+					System.out.println("Connection selected: " + con.getStartCity() + " -> " + con.getFinCity());
 				} else {
 					if (!processor.selectionStarted()) {
 						if (c.isSelected()) {

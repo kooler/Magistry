@@ -293,7 +293,10 @@ public class Processor implements Serializable {
 	public Connection getConnection(Point p) {
 		Connection con = null;
 		for(Connection c : connections) {
-			
+			if (c.hasPointInRegion(p, 10)) {
+				con = c;
+				break;
+			}
 		}
 		return con;
 	}
