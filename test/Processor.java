@@ -15,13 +15,14 @@ import data.*;
 public class Processor implements Serializable {
 	ArrayList<City> cities;
 	JPanel canvas;
-	final int CITY_RECT_WIDTH = 50;
-	final int CITY_RECT_HEIGHT = 50;
+	public final static int CITY_RECT_WIDTH = 50;
+	public final static int CITY_RECT_HEIGHT = 50;
 	City startCity = null;
 	City finCity = null;
 	private boolean selectionStarted = false;
 	ArrayList<Route> routes;
 	ArrayList<City> checkedCities;
+	ArrayList<Connection> connections = new ArrayList<Connection>();
 	
 	public Processor() {
 		cities = new ArrayList<City>();
@@ -100,17 +101,18 @@ public class Processor implements Serializable {
 	
 	private void drawConnection(City city1, City city2) {
 		//Draw line
-		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
-		g2d.setColor(Color.BLACK);
-		int x1 = 0, x2 = 0;
-		if (city1.getPoint().x < city2.getPoint().x) {
-			x1 = city1.getPoint().x + CITY_RECT_WIDTH;
-			x2 = city2.getPoint().x;
-		} else {
-			x1 = city1.getPoint().x;
-			x2 = city2.getPoint().x + CITY_RECT_WIDTH;
+		boolean drawed = false;
+		for (Connection c : connections) {
+			if (city1.equals(c.getStartCity()) && city2.equals(c.getFinCity())) {
+				drawed = true;
+				c.draw();
+			}
 		}
-		g2d.drawLine(x1, city1.getPoint().y + CITY_RECT_HEIGHT/2, x2, city2.getPoint().y + CITY_RECT_HEIGHT/2);
+		if (!drawed) {
+			Connection c = new Connection(city1, city2, canvas);
+			c.draw();
+			connections.add(c);
+		}
 	}
 	
 	public void connectCities(City city1, City city2) {
@@ -286,5 +288,13 @@ public class Processor implements Serializable {
 			System.err.println(r);
 		}
 		System.err.println("=========================================================");
+	}
+	
+	public Connection getConnection(Point p) {
+		Connection con = null;
+		for(Connection c : connections) {
+			
+		}
+		return con;
 	}
 }

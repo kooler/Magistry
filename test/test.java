@@ -65,6 +65,7 @@ public class test {
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
 				City c = processor.getCity(e.getPoint());
+				
 				if (c == null) {
 					new addCityFrame(processor, e.getPoint());
 				} else {
