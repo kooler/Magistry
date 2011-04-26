@@ -2,6 +2,7 @@ package test;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,22 +17,23 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import sun.reflect.generics.tree.BottomSignature;
-
 import data.City;
 import data.Connection;
-
+import forms.editConnectionFrame;
 import forms.addCityFrame;
 
 public class test {
 	public static Processor processor;
+	static JComboBox criteria;
 	/**
 	 * @param args
 	 */
@@ -70,7 +72,8 @@ public class test {
 				if (c == null && con == null) {
 					new addCityFrame(processor, e.getPoint());
 				} else if (con != null) {
-					System.out.println("Connection selected: " + con.getStartCity() + " -> " + con.getFinCity());
+					System.out.println("Selected connection: " + con);
+					new editConnectionFrame(processor, con);
 				} else {
 					if (!processor.selectionStarted()) {
 						if (c.isSelected()) {
@@ -97,7 +100,7 @@ public class test {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
-				processor.startSelection();
+				processor.startSelection(criteria.getSelectedItem().toString());
 			}
 		});
 		JButton reset = new JButton("Redraw/Reset selection");
@@ -160,7 +163,18 @@ public class test {
 		        }
 			}
 		});
-		mainFrame.add(buttons, BorderLayout.SOUTH);		
+		mainFrame.add(buttons, BorderLayout.SOUTH);
+		
+		//Criteria
+		JPanel criteriaPanel = new JPanel();
+		criteriaPanel.setLayout(new GridLayout(1,2));
+		criteria = new JComboBox();
+		criteria.addItem("Length");
+		criteria.addItem("Time");
+		criteria.addItem("Cost");
+		criteriaPanel.add(new JLabel("Criteria:"));
+		criteriaPanel.add(criteria);
+		opensave.add(criteriaPanel, BorderLayout.CENTER);
 		
 		processor = new Processor();
 		processor.setCanvas(canvas);

@@ -65,7 +65,7 @@ public class Routes {
 	/**
 	 * Make crossover between two routes
 	 */
-	public static Route crossover(Route route1, Route route2) {
+	public static Route crossover(Route route1, Route route2, Processor p) {
 		Route child = null;
 		ArrayList<Segment> commonSegments = getCommonSegments(route1, route2);
 		for (Segment s : commonSegments) {
@@ -87,7 +87,7 @@ public class Routes {
 			//System.out.println("Replacing in " + replaceIt.getRoute() + " [" + replaceIt + "] to [" + replacement + "]");
 			//System.out.println("Replacement segment: " + replacement);
 			//Replace segment
-			child = new Route(replaceIt.getRoute());
+			child = new Route(replaceIt.getRoute(), p);
 			child.replaceSegment(replaceIt, replacement);
 		} else {
 			//System.err.println("No similar segments found");

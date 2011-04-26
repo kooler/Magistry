@@ -12,6 +12,8 @@ import test.Processor;
 public class Connection {
 	private City city1 = null;
 	private City city2 = null;
+	private int time = 1;
+	private int cost = 1;
 	private ArrayList<Point> points = new ArrayList<Point>();
 	JPanel canvas;
 	
@@ -43,6 +45,11 @@ public class Connection {
 			g2d.drawRect(Math.round(x), Math.round(y), 0, 0);
 			points.add(new Point(Math.round(x), Math.round(y)));
 		}
+		
+		g2d.drawString(new Integer(time).toString(), city1.getPoint().x + (city2.getPoint().x - city1.getPoint().x)/2 - 15,
+				city1.getPoint().y + (city2.getPoint().y - city1.getPoint().y)/2);
+		g2d.drawString(new Integer(cost).toString(), city1.getPoint().x + (city2.getPoint().x - city1.getPoint().x)/2 + 15,
+				city1.getPoint().y + (city2.getPoint().y - city1.getPoint().y)/2);
 	}
 	
 	public City getStartCity() {
@@ -62,5 +69,25 @@ public class Connection {
 			}
 		}
 		return has;
+	}
+	
+	public void setTime(int t) {
+		time = t;
+	}
+	
+	public void setCost(int c) {
+		cost = c;
+	}
+	
+	public int getTime() {
+		return time;
+	}
+	
+	public int getCost() {
+		return cost;
+	}
+	
+	public String toString() {
+		return "From " + city1 + " to " + city2 + ", time=" + time + ", cost=" + cost;
 	}
 }

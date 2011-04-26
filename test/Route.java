@@ -4,15 +4,22 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import data.City;
+import data.Connection;
 import data.Segment;
 
 public class Route {
 	private ArrayList<City> cities = new ArrayList<City>();
+	Processor processor = null;
 	
 	public Route() {
 	}
 	
-	public Route(Route r) {
+	public Route(Processor p) {
+		processor = p;
+	}
+	
+	public Route(Route r, Processor p) {
+		processor = p;
 		for(City c : r.getCities()) {
 			addCity(c);
 		}
@@ -75,5 +82,33 @@ public class Route {
 					Math.pow(cities.get(i).getPoint().y - cities.get(i + 1).getPoint().y,2)));
 		}
 		return length;
+	}
+	
+	public int getCost() {
+		int cost = 0;
+		for (int i = 0; i < (cities.size() - 1); i++) {
+			cost += processor.getConnection(cities.get(i), cities.get(i + 1)).getCost();
+		}
+		return cost;
+	}
+	
+	public int getTime() {
+		int time = 0;
+		for (int i = 0; i < (cities.size() - 1); i++) {
+			if (processor != null) {
+				Connection c = processor.getConnection(cities.get(i), cities.get(i + 1));
+				if (c == null) {
+					c = processor.getConnection(cities.get(i + 1), cities.get(i));
+				}
+				if (c != null) {
+					time += c.getTime();
+				} else {
+					System.err.println("Cannot find connection between " + cities.get(i) + " and " + cities.get(i + 1));
+				}
+			} else {
+				System.err.println("Cannot find processor");
+			}
+		}
+		return time;
 	}
 }

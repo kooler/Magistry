@@ -23,6 +23,7 @@ public class Processor implements Serializable {
 	ArrayList<Route> routes;
 	ArrayList<City> checkedCities;
 	ArrayList<Connection> connections = new ArrayList<Connection>();
+	String criteria = "Length";
 	
 	public Processor() {
 		cities = new ArrayList<City>();
@@ -121,11 +122,12 @@ public class Processor implements Serializable {
 		drawConnection(city1, city2);
 	}
 	
-	public void startSelection() {
+	public void startSelection(String criteria) {
 		selectionStarted = true;
 		startCity = null;
 		finCity = null;
 		deselectAllCities();
+		this.criteria = criteria;
 	}
 	
 	public boolean selectionStarted() {
@@ -146,17 +148,26 @@ public class Processor implements Serializable {
 	
 	public Route getBestCreature() {
 		int bestLevel = 99999999;
-		Route parent1 = null;
+		Route best = null;
+		int param = 0;
 		for (Route r : routes) {
-			if (r.getLength() < bestLevel) {
-				parent1 = r;
+			if (criteria == "Length") {
+				param = r.getLength();
+			} else if (criteria == "Time") {
+				param = r.getTime();
+			} else if (criteria == "Cost") {
+				param = r.getCost();
+			}
+			if (param < bestLevel) {
+				best = r;
 				bestLevel = r.getLength();
 			}
 		}
-		return parent1;
+		return best;
 	}
 	
 	private void madePairingOfTwoBestParents() {
+		/*
 		//Get two bets parents
 		int bestLevel = 99999999;
 		Route parent1 = null;
@@ -174,14 +185,20 @@ public class Processor implements Serializable {
 				bestLevel = r.getLength();
 			}
 		}
+		*/
+		//Get two random parents
+		Random r = new Random();
+		Route parent1 = routes.get(Math.round(routes.size()/2 * r.nextFloat()));
+		Route parent2 = routes.get(Math.round(routes.size()/2 + routes.size()/2 * r.nextFloat()) - 1);
+		
 		
 		if (parent1 != null && parent2 != null) {
 			//System.out.println("Two parents Found!");
 			//System.out.println("Parent1: " + parent1);
 			//System.out.println("Parent2: " + parent2);
 			//Generate children
-			Route ch1 = Routes.crossover(parent1, parent2);
-			Route ch2 = Routes.crossover(parent1, parent2);
+			Route ch1 = Routes.crossover(parent1, parent2, this);
+			Route ch2 = Routes.crossover(parent1, parent2, this);
 			//System.out.println("Child1: " + ch1);
 			//System.out.println("Child2: " + ch2);
 			//Replace parent with children
@@ -194,24 +211,22 @@ public class Processor implements Serializable {
 	
 	private void startProcess() {
 		routes = new ArrayList<Route>();
-		int sizeOfPopulation = 100;
+		int sizeOfPopulation = 1000;
 		for (int i = 0; i < sizeOfPopulation; i++) {
 			generatePopulation();
 		}
-		printAllRoutes();
+		//printAllRoutes();
 		System.out.println("Current: " + getBestCreature());
-		int numberOfParings = 1000;
+		int numberOfParings = 10000;
 		for (int i = 0; i < numberOfParings; i++) {
 			madePairingOfTwoBestParents();
 		}
 		System.out.println("Parring: " + getBestCreature());
-		printAllRoutes();
-//		printDivider();
-		//printRoutes();
+		//printAllRoutes();
 	}
 	
 	public void generatePopulation() {
-		Route r = new Route();
+		Route r = new Route(this);
 		
 		checkedCities = new ArrayList<City>();
 		r.addCity(startCity);
@@ -248,7 +263,7 @@ public class Processor implements Serializable {
 					routes.add(route);
 					break;
 				} else {
-					Route newRoute = new Route(route);
+					Route newRoute = new Route(route, this);
 					newRoute.addCity(neigh);
 					checkNeightbours(neigh, lookFor, newRoute);
 				}
@@ -299,5 +314,17 @@ public class Processor implements Serializable {
 			}
 		}
 		return con;
+	}
+	
+	public Connection getConnection(City c1, City c2) {
+		Connection c = null;
+		for (Connection con : connections) {
+			if ((con.getStartCity().equals(c1) && con.getFinCity().equals(c2))
+					|| (con.getStartCity().equals(c2) && con.getFinCity().equals(c1))) {
+				c = con;
+				break;
+			}
+		}
+		return c;
 	}
 }
