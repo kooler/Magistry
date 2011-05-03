@@ -1,5 +1,6 @@
 package test;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -110,5 +111,29 @@ public class Route {
 			}
 		}
 		return time;
+	}
+	
+	private void drawConnections(Color col) {
+		for (int i = 0; i < (cities.size() - 1); i++) {
+			City c = cities.get(i);
+			City c1 = cities.get(i + 1);
+			processor.getConnection(c, c1).draw(col);
+		}
+	}
+	
+	public void draw(int delta, Color col) {
+		//processor.clearMap();
+		for (City c : cities) {
+			processor.fillCity(c, col, delta);
+		}
+		drawConnections(col);
+	}
+	
+	public void drawAsChild() {
+		//processor.clearMap();
+		for (City c : cities) {
+			processor.fillCity(c, Color.black, 0);
+		}
+		drawConnections(Color.black);
 	}
 }

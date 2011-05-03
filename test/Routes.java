@@ -46,6 +46,20 @@ public class Routes {
 		return commonSegments;
 	}
 	/**
+	 * Get all common cities both routes have
+	 */
+	private static ArrayList<City> getCommonCities(Route route1, Route route2) {
+		ArrayList<City> commonCities = new ArrayList<City>();
+		
+		for (City c : route1.getCities()) {
+			if (route2.getCities().contains(c)) {
+				commonCities.add(c);
+			}
+		}
+		
+		return commonCities;
+	}
+	/**
 	 * Get the segment with the same start/fin city but from another route
 	 */
 	private static Segment getSegmentFromAnotherRoute(Segment s, ArrayList<Segment> segments) {
@@ -67,28 +81,30 @@ public class Routes {
 	 */
 	public static Route crossover(Route route1, Route route2, Processor p) {
 		Route child = null;
-		ArrayList<Segment> commonSegments = getCommonSegments(route1, route2);
-		for (Segment s : commonSegments) {
-			//System.out.println("Found common segment:" + s);
-		}
+		ArrayList<City> commonCities = getCommonCities(route1, route2);
 		//Replace segment in route1 with another one from commonSegments
-		if (commonSegments.size() > 0) {
+		if (commonCities.size() > 0) {
 			Random r = new Random();
-			int segmentNumber = Math.round((commonSegments.size() - 1) * r.nextFloat()); 
-			Segment replaceIt = commonSegments.get(segmentNumber);
-			//System.out.println("Random segment: " + replaceIt);
-			Route searchInRoute;
-			if (replaceIt.getRoute().equals(route1)) {
-				searchInRoute = route2;
-			} else {
-				searchInRoute = route1;
+			int segmentNumber = Math.round((commonCities.size() - 1) * r.nextFloat()); 
+			City crossCity = commonCities.get(segmentNumber);
+			child = new Route(p);
+			for (int i = 0; i < route1.getCities().size(); i++) {
+				City c = route1.getCities().get(i);
+				if (c.equals(crossCity)) {
+					break;
+				}
+				child.addCity(c);
 			}
-			Segment replacement = getSegmentFromAnotherRoute(replaceIt, getRouteSegments(searchInRoute));
-			//System.out.println("Replacing in " + replaceIt.getRoute() + " [" + replaceIt + "] to [" + replacement + "]");
-			//System.out.println("Replacement segment: " + replacement);
-			//Replace segment
-			child = new Route(replaceIt.getRoute(), p);
-			child.replaceSegment(replaceIt, replacement);
+			boolean start = false;
+			for (int i = 0; i < route2.getCities().size(); i++) {
+				City c = route2.getCities().get(i);
+				if (c.equals(crossCity)) {
+					start = true;
+				}
+				if (start) {
+					child.addCity(c);
+				}
+			}
 		} else {
 			//System.err.println("No similar segments found");
 		}

@@ -24,8 +24,12 @@ public class Connection {
 	}
 	
 	public void draw() {
+		draw(Color.black);
+	}
+	
+	public void draw(Color col) {
 		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
-		g2d.setColor(Color.BLACK);
+		g2d.setColor(col);
 		
 		int steps = 0;
 		float dx = city2.getPoint().x - city1.getPoint().x;

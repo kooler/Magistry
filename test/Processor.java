@@ -24,6 +24,8 @@ public class Processor implements Serializable {
 	ArrayList<City> checkedCities;
 	ArrayList<Connection> connections = new ArrayList<Connection>();
 	String criteria = "Length";
+	boolean showGeneticProcess = false;
+	int visualDelayTime = 1000;
 	
 	public Processor() {
 		cities = new ArrayList<City>();
@@ -39,6 +41,8 @@ public class Processor implements Serializable {
 	}
 	
 	public void addCity(String name, Point p) {
+		p.x -= CITY_RECT_WIDTH/2;
+		p.y -= CITY_RECT_HEIGHT/2;
 		City c = new City(name, p);
 		cities.add(c);
 		selectCity(c);
@@ -75,12 +79,43 @@ public class Processor implements Serializable {
 		c.select();
 	}
 	
-	public void deselectCity(City c) {
+	public void fillCity(City c, Color col, int delta) {
 		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
-		g2d.setColor(Color.BLACK);
+		g2d.setBackground(col);
+		g2d.setColor(col);
+		if (delta == 0) {
+			g2d.fillOval(c.getPoint().x, c.getPoint().y, CITY_RECT_WIDTH, CITY_RECT_HEIGHT);
+		} else {
+			g2d.drawOval(c.getPoint().x - delta/2, c.getPoint().y - delta/2, CITY_RECT_WIDTH + delta, CITY_RECT_HEIGHT + delta);
+		}
+		g2d.drawString(c.getName(), c.getPoint().x + 10, c.getPoint().y + 30);
+	}
+	
+	public void selectCityInRoute(City c) {
+		selectCity(c, Color.magenta);
+	}
+	
+	public void deselectCity(City c) {
+		deselectCity(c, Color.black);
+	}
+	
+	public void deselectCity(City c, Color col) {
+		Graphics2D g2d = (Graphics2D)canvas.getGraphics();
+		g2d.setColor(col);
 		g2d.drawOval(c.getPoint().x, c.getPoint().y, CITY_RECT_WIDTH, CITY_RECT_HEIGHT);
 		g2d.drawString(c.getName(), c.getPoint().x + 10, c.getPoint().y + 30);
 		c.deselect();
+	}
+	
+	public void clearMap() {
+		canvas.getGraphics().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		canvas.setBackground(Color.white);
+		for (City c: cities) {
+			deselectCity(c, Color.lightGray);
+		}
+		for (Connection c : connections) {
+			c.draw(Color.lightGray);
+		}
 	}
 	
 	public void deselectAllCities() {
@@ -141,13 +176,17 @@ public class Processor implements Serializable {
 			finCity = c;
 			selectionStarted = false;
 			selectCity(finCity, Color.BLUE);
-			startProcess();
+			try {
+				startProcess();
+			} catch (Exception e) {
+				System.err.println(e.getMessage());
+			}
 		}
 		selectCity(startCity, Color.BLUE);
 	}
 	
 	public Route getBestCreature() {
-		int bestLevel = 99999999;
+		int bestLevel = 9999999;
 		Route best = null;
 		int param = 0;
 		for (Route r : routes) {
@@ -166,31 +205,40 @@ public class Processor implements Serializable {
 		return best;
 	}
 	
-	private void madePairingOfTwoBestParents() {
-		/*
-		//Get two bets parents
-		int bestLevel = 99999999;
-		Route parent1 = null;
-		for (Route r : routes) {
-			if (r.getLength() < bestLevel) {
-				parent1 = r;
-				bestLevel = r.getLength();
+	public int getWorthCreature() {
+		int worthLevel = 0;
+		int best = 0;
+		int param = 0;
+		for (int i = 0; i < routes.size(); i++) {
+			Route r = routes.get(i);
+			if (criteria == "Length") {
+				param = r.getLength();
+			} else if (criteria == "Time") {
+				param = r.getTime();
+			} else if (criteria == "Cost") {
+				param = r.getCost();
+			}
+			if (param > worthLevel) {
+				best = i;
+				worthLevel = r.getLength();
 			}
 		}
-		Route parent2 = null;
-		bestLevel = 99999999;
-		for (Route r : routes) {
-			if (r.getLength() < bestLevel && !r.equals(parent1)) {
-				parent2 = r;
-				bestLevel = r.getLength();
-			}
-		}
-		*/
+		return best;
+	}
+	
+	private void madePairingOfTwoBestParents() throws InterruptedException {
 		//Get two random parents
 		Random r = new Random();
 		Route parent1 = routes.get(Math.round(routes.size()/2 * r.nextFloat()));
 		Route parent2 = routes.get(Math.round(routes.size()/2 + routes.size()/2 * r.nextFloat()) - 1);
 		
+		if (showGeneticProcess) {
+			clearMap();
+			parent1.draw(6, Color.red);
+			Thread.sleep(visualDelayTime);
+			parent2.draw(10, Color.blue);
+			Thread.sleep(visualDelayTime);
+		}
 		
 		if (parent1 != null && parent2 != null) {
 			//System.out.println("Two parents Found!");
@@ -198,31 +246,40 @@ public class Processor implements Serializable {
 			//System.out.println("Parent2: " + parent2);
 			//Generate children
 			Route ch1 = Routes.crossover(parent1, parent2, this);
-			Route ch2 = Routes.crossover(parent1, parent2, this);
+			//Route ch2 = Routes.crossover(parent1, parent2, this);
 			//System.out.println("Child1: " + ch1);
 			//System.out.println("Child2: " + ch2);
 			//Replace parent with children
-			parent1 = ch1;
-			parent2 = ch2;
+			
+			routes.set(getWorthCreature(), ch1);
+			
+			if (showGeneticProcess) {
+				ch1.drawAsChild();
+				Thread.sleep(visualDelayTime);
+				//ch2.drawAsChild();
+				Thread.sleep(visualDelayTime);
+			}
+			
 		} else {
 			//System.err.println("Can't find two parents");
 		}
 	}
 	
-	private void startProcess() {
+	private void startProcess() throws InterruptedException {
 		routes = new ArrayList<Route>();
-		int sizeOfPopulation = 1000;
+		int sizeOfPopulation = 50;
 		for (int i = 0; i < sizeOfPopulation; i++) {
 			generatePopulation();
 		}
-		//printAllRoutes();
+		printAllRoutes();
 		System.out.println("Current: " + getBestCreature());
-		int numberOfParings = 10000;
+		int numberOfParings = 1000;
 		for (int i = 0; i < numberOfParings; i++) {
 			madePairingOfTwoBestParents();
+			//Thread.sleep(visualDelayTime);
 		}
-		System.out.println("Parring: " + getBestCreature());
-		//printAllRoutes();
+		System.out.println("After Parrings " + getBestCreature());
+		printAllRoutes();
 	}
 	
 	public void generatePopulation() {

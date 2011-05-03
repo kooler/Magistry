@@ -1,6 +1,7 @@
 package test;
 
 import java.awt.BorderLayout;
+import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -17,6 +18,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -25,6 +27,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import data.City;
 import data.Connection;
@@ -167,7 +171,18 @@ public class test {
 		
 		//Criteria
 		JPanel criteriaPanel = new JPanel();
-		criteriaPanel.setLayout(new GridLayout(1,2));
+		criteriaPanel.setLayout(new GridLayout(1,3));
+		JCheckBox showProcess = new JCheckBox();
+		showProcess.setText("Show genetic process");
+		showProcess.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				JCheckBox cb = (JCheckBox) arg0.getSource();
+				processor.showGeneticProcess = cb.isSelected();
+			}
+		});
+		criteriaPanel.add(showProcess);
+		
 		criteria = new JComboBox();
 		criteria.addItem("Length");
 		criteria.addItem("Time");
