@@ -267,13 +267,13 @@ public class Processor implements Serializable {
 	
 	private void startProcess() throws InterruptedException {
 		routes = new ArrayList<Route>();
-		int sizeOfPopulation = 50;
+		int sizeOfPopulation = 15;
 		for (int i = 0; i < sizeOfPopulation; i++) {
 			generatePopulation();
 		}
 		printAllRoutes();
 		System.out.println("Current: " + getBestCreature());
-		int numberOfParings = 1000;
+		int numberOfParings = 15;
 		for (int i = 0; i < numberOfParings; i++) {
 			madePairingOfTwoBestParents();
 			//Thread.sleep(visualDelayTime);
@@ -306,7 +306,7 @@ public class Processor implements Serializable {
 	private void checkNeightbours(City c, City lookFor, Route route) {
 		//Get random neighbour
 		boolean processed = false;
-		int MAX_ITERATIONS = 1000;
+		int MAX_ITERATIONS = 10;
 		int iteration = 0;
 		Random r = new Random();
 		do {
